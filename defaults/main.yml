@@ -61,7 +61,7 @@ cinny_container_network: "{{ cinny_identifier }}"
 cinny_container_http_host_bind_port: ""
 
 # The port number in the container
-cinny_container_http_port: 3000
+cinny_container_http_port: 8080
 
 # A list of additional container networks that the container would be connected to.
 # The role does not create these networks, so make sure they already exist.
