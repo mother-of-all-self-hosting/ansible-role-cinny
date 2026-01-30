@@ -1,5 +1,10 @@
-# SPDX-FileCopyrightText: 2023-2025 Slavi Pantaleev
-# SPDX-FileCopyrightText: 2025 Suguru Hirahara
+# SPDX-FileCopyrightText: 2022 MDAD project contributors
+# SPDX-FileCopyrightText: 2022 Marko Weltzer
+# SPDX-FileCopyrightText: 2022 Nikita Chernyi
+# SPDX-FileCopyrightText: 2022 Sebastian Gumprich
+# SPDX-FileCopyrightText: 2022-2025 Slavi Pantaleev
+# SPDX-FileCopyrightText: 2024 David Mehren
+# SPDX-FileCopyrightText: 2025, 2026 Suguru Hirahara
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
@@ -25,6 +30,14 @@
   with_items:
     - env
     - labels
+
+- name: Ensure Cinny configuration installed
+  ansible.builtin.copy:
+    content: "{{ cinny_configuration | to_nice_json }}"
+    dest: "{{ cinny_data_path }}/config.json"
+    mode: "0640"
+    owner: "{{ cinny_uid }}"
+    group: "{{ cinny_gid }}"
 
 - name: Run if self-building of Cinny container image is not enabled
   when: "not cinny_container_image_self_build | bool"
