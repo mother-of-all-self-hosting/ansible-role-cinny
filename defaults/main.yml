@@ -18,7 +18,7 @@ cinny_enabled: true
 
 cinny_identifier: cinny
 cinny_base_path: "/{{ cinny_identifier }}"
-cinny_data_path: "{{ cinny_base_path }}/data"
+cinny_config_path: "{{ cinny_base_path }}/config"
 
 # renovate: datasource=docker depName=ajbura/cinny
 cinny_version: v4.10.2

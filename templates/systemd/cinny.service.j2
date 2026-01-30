@@ -1,7 +1,8 @@
 {#
+SPDX-FileCopyrightText: 2022 MDAD project contributors
 SPDX-FileCopyrightText: 2023 Slavi Pantaleev
 SPDX-FileCopyrightText: 2024 Nikita Chernyi
-SPDX-FileCopyrightText: 2025 Suguru Hirahara
+SPDX-FileCopyrightText: 2025, 2026 Suguru Hirahara
 
 SPDX-License-Identifier: AGPL-3.0-or-later
 #}
@@ -38,7 +39,8 @@ ExecStartPre={{ devture_systemd_docker_base_host_command_docker }} create \
       {% endif %}
       --env-file={{ cinny_base_path }}/env \
       --label-file={{ cinny_base_path }}/labels \
-      --mount type=bind,src={{ cinny_data_path }},dst=/data/data \
+      --mount type=bind,src={{ cinny_config_path }}/nginx.conf,dst=/etc/nginx/nginx.conf,ro \
+      --mount type=bind,src={{ cinny_config_path }}/config.json,dst=/app/config.json,ro \
       {% for volume in cinny_container_additional_volumes %}
       --mount type={{ volume.type | default('bind' if '/' in volume.src else 'volume') }},src={{ volume.src }},dst={{ volume.dst }}{{ (',' + volume.options) if volume.options else '' }} \
       {% endfor %}

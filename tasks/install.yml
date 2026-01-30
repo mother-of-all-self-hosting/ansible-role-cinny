@@ -18,7 +18,7 @@
     group: "{{ cinny_gid }}"
   with_items:
     - "{{ cinny_base_path }}"
-    - "{{ cinny_data_path }}"
+    - "{{ cinny_config_path }}"
 
 - name: Ensure Cinny support files installed
   ansible.builtin.template:
@@ -31,10 +31,20 @@
     - env
     - labels
 
+- name: Ensure Cinny nginx.conf installed
+  ansible.builtin.template:
+    src: "{{ role_path }}/templates/{{ item }}.j2"
+    dest: "{{ cinny_config_path }}/{{ item }}"
+    mode: "0640"
+    owner: "{{ cinny_uid }}"
+    group: "{{ cinny_gid }}"
+  with_items:
+    - nginx.conf
+
 - name: Ensure Cinny configuration installed
   ansible.builtin.copy:
     content: "{{ cinny_configuration | to_nice_json }}"
-    dest: "{{ cinny_data_path }}/config.json"
+    dest: "{{ cinny_config_path }}/config.json"
     mode: "0640"
     owner: "{{ cinny_uid }}"
     group: "{{ cinny_gid }}"
