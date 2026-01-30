@@ -1,14 +1,18 @@
-# SPDX-FileCopyrightText: 2023, 2024 Nikita Chernyi
-# SPDX-FileCopyrightText: 2023-2025 Slavi Pantaleev
+# SPDX-FileCopyrightText: 2022 László Várady
+# SPDX-FileCopyrightText: 2022 MDAD project contributors
+# SPDX-FileCopyrightText: 2022 Marko Weltzer
+# SPDX-FileCopyrightText: 2022-2024 Nikita Chernyi
+# SPDX-FileCopyrightText: 2022-2025 Slavi Pantaleev
+# SPDX-FileCopyrightText: 2023 Samuel Meenzen
 # SPDX-FileCopyrightText: 2024 Julian-Samuel Gebühr
 # SPDX-FileCopyrightText: 2024 Sergio Durigan Junior
+# SPDX-FileCopyrightText: 2024-2026 Suguru Hirahara
 # SPDX-FileCopyrightText: 2025 MASH project contributors
-# SPDX-FileCopyrightText: 2025 Suguru Hirahara
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 ---
-# Project source code URL: https://github.com/cinny/cinny
+# Project source code URL: https://github.com/ajbura/cinny
 
 cinny_enabled: true
 
@@ -16,8 +20,8 @@ cinny_identifier: cinny
 cinny_base_path: "/{{ cinny_identifier }}"
 cinny_data_path: "{{ cinny_base_path }}/data"
 
-# renovate: datasource=docker depName=ghcr.io/cinny/cinny
-cinny_version: v2.13.5
+# renovate: datasource=docker depName=ajbura/cinny
+cinny_version: v4.10.2
 
 cinny_uid: ""
 cinny_gid: ""
@@ -35,16 +39,16 @@ cinny_hostname: ""
 # technical limitations.
 cinny_path_prefix: /
 
-cinny_container_image: "{{ cinny_container_image_registry_prefix }}cinny/cinny:{{ cinny_container_image_tag }}"
+cinny_container_image: "{{ cinny_container_image_registry_prefix }}ajbura/cinny:{{ cinny_container_image_tag }}"
 cinny_container_image_tag: "{{ cinny_version }}"
 cinny_container_image_registry_prefix: "{{ cinny_container_image_registry_prefix_upstream }}"
 cinny_container_image_registry_prefix_upstream: "{{ cinny_container_image_registry_prefix_upstream_default }}"
-cinny_container_image_registry_prefix_upstream_default: ghcr.io/
+cinny_container_image_registry_prefix_upstream_default: docker.io/
 cinny_container_image_force_pull: "{{ cinny_container_image.endswith(':latest') }}"
 
 cinny_container_image_self_build: false
-cinny_container_image_self_build_name: "cinny/cinny:{{ cinny_container_image_self_build_repo_version }}"
-cinny_container_image_self_build_repo: "https://github.com/cinny/cinny.git"
+cinny_container_image_self_build_name: "ajbura/cinny:{{ cinny_container_image_self_build_repo_version }}"
+cinny_container_image_self_build_repo: "https://github.com/ajbura/cinny.git"
 cinny_container_image_self_build_repo_version: "{{ cinny_version if cinny_version != 'latest' else 'main' }}"
 cinny_container_image_self_build_src_files_path: "{{ cinny_base_path }}/docker-src"
 
