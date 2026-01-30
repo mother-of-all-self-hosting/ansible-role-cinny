@@ -24,33 +24,6 @@
         path: "{{ devture_systemd_docker_base_systemd_path }}/{{ cinny_identifier }}.service"
         state: absent
 
-    - name: Ensure Cinny support files do not exist
-      ansible.builtin.file:
-        path: "{{ cinny_base_path }}/{{ item }}"
-        state: absent
-      with_items:
-        - env
-        - labels
-
-    - name: Ensure Cinny image source files path does not exist
-      ansible.builtin.file:
-        path: "{{ cinny_container_image_self_build_src_files_path }}"
-        state: absent
-
-    - name: Ensure Cinny local data path does not exist if empty
-      ansible.builtin.command:
-        cmd: "rmdir {{ cinny_data_path }}"
-      register: cinny_data_path_deletion_result
-      changed_when: cinny_data_path_deletion_result.rc == 0
-      failed_when: false
-
-    - name: Ensure Cinny base path does not exist if empty
-      ansible.builtin.command:
-        cmd: "rmdir {{ cinny_base_path }}"
-      register: cinny_base_path_deletion_result
-      changed_when: cinny_base_path_deletion_result.rc == 0
-      failed_when: false
-
     - name: Ensure Cinny container network does not exist via community.docker.docker_network
       when: devture_systemd_docker_base_container_network_creation_method == 'ansible-module'
       community.docker.docker_network:
@@ -66,20 +39,7 @@
       register: network_deletion_result
       changed_when: cinny_container_network in network_deletion_result.stdout
 
-- name: Check existence of Cinny local data path
-  ansible.builtin.stat:
-    path: "{{ cinny_data_path }}"
-  register: cinny_data_path_stat
-
-# We just want to notify the user. Deleting data is too destructive.
-- name: Notify if Cinny local data remains
-  when: cinny_data_path_stat.stat.exists | bool
-  ansible.builtin.set_fact:
-    devture_playbook_runtime_messages_list: |
-      {{
-        devture_playbook_runtime_messages_list | default([])
-        +
-        [
-          "Note: As the local Cinny instance has been removed, some old data remains in `" + cinny_data_path + "`. Feel free to delete it."
-        ]
-      }}
+    - name: Ensure Cinny path does not exist
+      ansible.builtin.file:
+        path: "{{ cinny_base_path }}"
+        state: absent
