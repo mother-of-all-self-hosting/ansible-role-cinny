@@ -190,42 +190,61 @@ cinny_systemd_wanted_services_list_default: []
 cinny_systemd_wanted_services_list_auto: []
 cinny_systemd_wanted_services_list_custom: []
 
-# Specify database configuration
-cinny_database_hostname: ""
-cinny_database_port: 5432
-cinny_database_username: cinny
-cinny_database_password: ""
-cinny_database_name: cinny
-cinny_environment_variables_database_url: postgresql://{{ cinny_database_username }}:{{ cinny_database_password }}@{{ cinny_database_hostname }}:{{ cinny_database_port }}/{{ cinny_database_name }}
+# Default homeserver URL to use in the `config.json` file.
+# See `cinny_config_homeserverList`.
+cinny_default_hs_url: ""
+
+# Controls whether the Cinny access log is enabled
+cinny_access_log_enabled: true
+
+# Controls the `defaultHomeserver` value in the `config.json` file.
+cinny_config_defaultHomeserver: 0  # noqa var-naming
+
+# Controls the `homeserverList` value in the `config.json` file.
+cinny_config_homeserverList: "{{ [cinny_default_hs_url] }}"  # noqa var-naming
+
+# Controls the `allowCustomHomeservers` value in the `config.json` file.
+cinny_config_allowCustomHomeservers: true  # noqa var-naming
+
+# Controls the `featuredCommunities.spaces` value in the `config.json` file.
+cinny_config_featuredCommunities_spaces: []  # noqa var-naming
+
+# Controls the `featuredCommunities.rooms` value in the `config.json` file.
+cinny_config_featuredCommunities_rooms: []  # noqa var-naming
+
+# Controls the `featuredCommunities.servers` value in the `config.json` file.
+cinny_config_featuredCommunities_servers: ["matrix.org"]  # noqa var-naming
+
+# Controls the `featuredCommunities.openAsDefault` value in the `config.json` file.
+cinny_config_featuredCommunities_openAsDefault: false  # noqa var-naming
+
+# Default Cinny configuration template which covers the generic use case.
+# You can customize it by controlling the various variables inside it.
+#
+# For a more advanced customization, you can extend the default (see `cinny_configuration_extension_json`)
+# or completely replace this variable with your own template.
+#
+# The side-effect of this lookup is that Ansible would even parse the JSON for us, returning a dict.
+# This is unlike what it does when looking up YAML template files (no automatic parsing there).
+cinny_configuration_default: "{{ lookup('template', 'templates/config.json.j2', convert_data=False) | from_json }}"
+
+# Your custom JSON configuration for Cinny should go to `cinny_configuration_extension_json`.
+# This configuration extends the default starting configuration (`cinny_configuration_default`).
+#
+# You can override individual variables from the default configuration, or introduce new ones.
+#
+# If you need something more special, you can take full control by
+# completely redefining `cinny_configuration_default`.
+cinny_configuration_extension_json: '{}'
+
+cinny_configuration_extension: "{{ cinny_configuration_extension_json | from_json if cinny_configuration_extension_json | from_json is mapping else {} }}"
+
+# Holds the final Cinny configuration (a combination of the default and its extension).
+# You most likely don't need to touch this variable. Instead, see `cinny_configuration_default`.
+cinny_configuration: "{{ cinny_configuration_default | combine(cinny_configuration_extension, recursive=True) }}"
 
 # Specify the timezone
 cinny_environment_variables_tz: UTC
-
-# Specify a random string used for session management
-# generated with `pwgen -s 64 1` or in another way.
-cinny_environment_variables_nextauth_secret: ""
-
-cinny_environment_variables_nextauth_url: http://localhost:3000/api/v1/auth
-
-# Specify a Meilisearch hostname to enable advanced search options
-cinny_environment_variables_meili_host: ""
-
-# Specify a Meilisearch API key to enable advanced search options
-# Note that the default Admin API Key is sufficient for using Meilisearch on a Cinny instance
-cinny_environment_variables_meili_key: ""
-
-# Control if user registration will be disabled
-cinny_environment_variables_next_public_disable_registration: true
-
-# Set to `true` to enable email functions such as password recovery and email address verification
-cinny_environment_variables_next_public_email_provider: false
-
-# Specify the email address from which will send the verification emails
-cinny_environment_variables_email_from: ""
-
-# Specify the url-encoded string with your credentials and the smtp server
-# Example: smtp://user:password@host:port
-cinny_environment_variables_email_server: ""
 
 # Additional environment variables.
 cinny_environment_variables_additional_variables: ""

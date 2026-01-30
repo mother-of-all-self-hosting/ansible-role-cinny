@@ -26,12 +26,6 @@ Cinny is a self-hosted, open-source collaborative bookmark manager to collect, o
 
 See the project's [documentation](https://docs.cinny.app) to learn what Cinny does and why it might be useful to you.
 
-## Prerequisites
-
-To run a Cinny instance it is necessary to prepare a [Postgres](https://www.postgresql.org/) database server.
-
-If you are looking for an Ansible role for Postgres, you can check out [ansible-role-postgres](https://github.com/mother-of-all-self-hosting/ansible-role-postgres) maintained by the [Mother-of-All-Self-Hosting (MASH)](https://github.com/mother-of-all-self-hosting) team.
-
 ## Adjusting the playbook configuration
 
 To enable Cinny with this role, add the following configuration to your `vars.yml` file.
@@ -66,72 +60,6 @@ After adjusting the hostname, make sure to adjust your DNS records to point the 
 
 **Note**: hosting Cinny under a subpath (by configuring the `cinny_path_prefix` variable) does not seem to be possible due to Cinny's technical limitations.
 
-### Set variables for connecting to a Postgres database server
-
-To have the Cinny instance connect to your Postgres server, add the following configuration to your `vars.yml` file.
-
-```yaml
-cinny_database_hostname: YOUR_POSTGRES_SERVER_HOSTNAME_HERE
-cinny_database_port: 5432
-cinny_database_username: YOUR_POSTGRES_SERVER_USERNAME_HERE
-cinny_database_password: YOUR_POSTGRES_SERVER_PASSWORD_HERE
-cinny_database_name: YOUR_POSTGRES_SERVER_DATABASE_NAME_HERE
-```
-
-Make sure to replace values for variables with yours.
-
-### Set a random string
-
-You also need to set a random string used for session management. To do so, add the following configuration to your `vars.yml` file. The value can be generated with `pwgen -s 64 1` or in another way.
-
-```yaml
-cinny_environment_variables_nextauth_secret: YOUR_SECRET_KEY_HERE
-```
-
-### Enabling signing up
-
-By default this role is configured to disable signing up for an account on the service. To enable it, add the following configuration to your `vars.yml` file:
-
-```yaml
-cinny_environment_variables_next_public_disable_registration: false
-```
-
-### Connecting to a Meilisearch instance (optional)
-
-To enable the [advanced search options](https://docs.cinny.app/Usage/advanced-search), you can optionally have the Cinny instance connect to a Meilisearch instance by adding the following configuration to your `vars.yml` file:
-
-```yaml
-cinny_environment_variables_meili_host: YOUR_MEILISEARCH_HOSTNAME_HERE
-cinny_environment_variables_meili_key: YOUR_MEILISEARCH_KEY_HERE
-```
-
->[!NOTE]
-> The default Admin API Key is sufficient for using Meilisearch on a Cinny instance. It is [not recommended](https://www.meilisearch.com/docs/learn/security/basic_security) to use the master key for operations anything but managing other API keys.
-
-If you are looking for an Ansible role for Meilisearch, you can check out [ansible-role-meilisearch](https://github.com/mother-of-all-self-hosting/ansible-role-meilisearch) maintained by the [Mother-of-All-Self-Hosting (MASH)](https://github.com/mother-of-all-self-hosting) team.
-
-### Configuring a SMTP mailer (optional)
-
-You can configure a SMTP mailer to enable email functions such as password recovery and email address verification.
-
-To configure it, add the following configuration to your `vars.yml` file as below (adapt to your needs):
-
-```yaml
-cinny_environment_variables_next_public_email_provider: true
-
-# Specify the email address from which will send the verification emails
-cinny_environment_variables_email_from: ""
-
-# Specify the url-encoded string with your credentials and the SMTP server
-# Example: smtp://user:password@host:port
-cinny_environment_variables_email_server: ""
-```
-
-See [this section](https://docs.cinny.app/self-hosting/environment-variables#smtp-settings) on the official documentation for details.
-
->[!NOTE]
-> Without setting an authentication method such as DKIM, SPF, and DMARC for your hostname, emails are most likely to be quarantined as spam at recipient's mail servers. If you have set up a mail server with the [MASH project's exim-relay Ansible role](https://github.com/mother-of-all-self-hosting/ansible-role-exim-relay), you can enable DKIM signing with it. Refer [its documentation](https://github.com/mother-of-all-self-hosting/ansible-role-exim-relay/blob/main/docs/configuring-exim-relay.md#enable-dkim-support-optional) for details.
-
 ### Extending the configuration
 
 There are some additional things you may wish to configure about the component.
@@ -160,8 +88,6 @@ If you use the MASH playbook, the shortcut commands with the [`just` program](ht
 After running the command for installation, Cinny becomes available at the specified hostname like `https://example.com`.
 
 To get started, open the URL with a web browser, and register the account. **Note that the first registered user becomes an administrator automatically.**
-
-Since account registration is disabled by default, you need to enable it first by setting `cinny_environment_variables_next_public_disable_registration` to `false` temporarily in order to create your own account.
 
 ## Troubleshooting
 
