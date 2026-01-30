@@ -4,82 +4,82 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 ---
-- name: Check existence of Linkwarden systemd service
+- name: Check existence of Cinny systemd service
   ansible.builtin.stat:
-    path: "{{ devture_systemd_docker_base_systemd_path }}/{{ linkwarden_identifier }}.service"
-  register: linkwarden_service_stat
+    path: "{{ devture_systemd_docker_base_systemd_path }}/{{ cinny_identifier }}.service"
+  register: cinny_service_stat
 
-- name: Uninstall Linkwarden systemd services and files
-  when: linkwarden_service_stat.stat.exists | bool
+- name: Uninstall Cinny systemd services and files
+  when: cinny_service_stat.stat.exists | bool
   block:
-    - name: Ensure Linkwarden systemd service is stopped
+    - name: Ensure Cinny systemd service is stopped
       ansible.builtin.service:
-        name: "{{ linkwarden_identifier }}"
+        name: "{{ cinny_identifier }}"
         state: stopped
         enabled: false
         daemon_reload: true
 
-    - name: Ensure Linkwarden systemd service does not exist
+    - name: Ensure Cinny systemd service does not exist
       ansible.builtin.file:
-        path: "{{ devture_systemd_docker_base_systemd_path }}/{{ linkwarden_identifier }}.service"
+        path: "{{ devture_systemd_docker_base_systemd_path }}/{{ cinny_identifier }}.service"
         state: absent
 
-    - name: Ensure Linkwarden support files do not exist
+    - name: Ensure Cinny support files do not exist
       ansible.builtin.file:
-        path: "{{ linkwarden_base_path }}/{{ item }}"
+        path: "{{ cinny_base_path }}/{{ item }}"
         state: absent
       with_items:
         - env
         - labels
 
-    - name: Ensure Linkwarden image source files path does not exist
+    - name: Ensure Cinny image source files path does not exist
       ansible.builtin.file:
-        path: "{{ linkwarden_container_image_self_build_src_files_path }}"
+        path: "{{ cinny_container_image_self_build_src_files_path }}"
         state: absent
 
-    - name: Ensure Linkwarden local data path does not exist if empty
+    - name: Ensure Cinny local data path does not exist if empty
       ansible.builtin.command:
-        cmd: "rmdir {{ linkwarden_data_path }}"
-      register: linkwarden_data_path_deletion_result
-      changed_when: linkwarden_data_path_deletion_result.rc == 0
+        cmd: "rmdir {{ cinny_data_path }}"
+      register: cinny_data_path_deletion_result
+      changed_when: cinny_data_path_deletion_result.rc == 0
       failed_when: false
 
-    - name: Ensure Linkwarden base path does not exist if empty
+    - name: Ensure Cinny base path does not exist if empty
       ansible.builtin.command:
-        cmd: "rmdir {{ linkwarden_base_path }}"
-      register: linkwarden_base_path_deletion_result
-      changed_when: linkwarden_base_path_deletion_result.rc == 0
+        cmd: "rmdir {{ cinny_base_path }}"
+      register: cinny_base_path_deletion_result
+      changed_when: cinny_base_path_deletion_result.rc == 0
       failed_when: false
 
-    - name: Ensure Linkwarden container network does not exist via community.docker.docker_network
+    - name: Ensure Cinny container network does not exist via community.docker.docker_network
       when: devture_systemd_docker_base_container_network_creation_method == 'ansible-module'
       community.docker.docker_network:
-        name: "{{ linkwarden_container_network }}"
+        name: "{{ cinny_container_network }}"
         state: absent
 
-    - name: Ensure Linkwarden container network does not exist via ansible.builtin.command
+    - name: Ensure Cinny container network does not exist via ansible.builtin.command
       when: devture_systemd_docker_base_container_network_creation_method == 'command'
       ansible.builtin.command:
         cmd: >-
           {{ devture_systemd_docker_base_host_command_docker }} network rm
-          {{ linkwarden_container_network }}
+          {{ cinny_container_network }}
       register: network_deletion_result
-      changed_when: linkwarden_container_network in network_deletion_result.stdout
+      changed_when: cinny_container_network in network_deletion_result.stdout
 
-- name: Check existence of Linkwarden local data path
+- name: Check existence of Cinny local data path
   ansible.builtin.stat:
-    path: "{{ linkwarden_data_path }}"
-  register: linkwarden_data_path_stat
+    path: "{{ cinny_data_path }}"
+  register: cinny_data_path_stat
 
 # We just want to notify the user. Deleting data is too destructive.
-- name: Notify if Linkwarden local data remains
-  when: linkwarden_data_path_stat.stat.exists | bool
+- name: Notify if Cinny local data remains
+  when: cinny_data_path_stat.stat.exists | bool
   ansible.builtin.set_fact:
     devture_playbook_runtime_messages_list: |
       {{
         devture_playbook_runtime_messages_list | default([])
         +
         [
-          "Note: As the local Linkwarden instance has been removed, some old data remains in `" + linkwarden_data_path + "`. Feel free to delete it."
+          "Note: As the local Cinny instance has been removed, some old data remains in `" + cinny_data_path + "`. Feel free to delete it."
         ]
       }}

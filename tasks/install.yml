@@ -4,73 +4,73 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 ---
-- name: Ensure Linkwarden paths exist
+- name: Ensure Cinny paths exist
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
     mode: "0750"
-    owner: "{{ linkwarden_uid }}"
-    group: "{{ linkwarden_gid }}"
+    owner: "{{ cinny_uid }}"
+    group: "{{ cinny_gid }}"
   with_items:
-    - "{{ linkwarden_base_path }}"
-    - "{{ linkwarden_data_path }}"
+    - "{{ cinny_base_path }}"
+    - "{{ cinny_data_path }}"
 
-- name: Ensure Linkwarden support files installed
+- name: Ensure Cinny support files installed
   ansible.builtin.template:
     src: "{{ role_path }}/templates/{{ item }}.j2"
-    dest: "{{ linkwarden_base_path }}/{{ item }}"
+    dest: "{{ cinny_base_path }}/{{ item }}"
     mode: "0640"
-    owner: "{{ linkwarden_uid }}"
-    group: "{{ linkwarden_gid }}"
+    owner: "{{ cinny_uid }}"
+    group: "{{ cinny_gid }}"
   with_items:
     - env
     - labels
 
-- name: Run if self-building of Linkwarden container image is not enabled
-  when: "not linkwarden_container_image_self_build | bool"
+- name: Run if self-building of Cinny container image is not enabled
+  when: "not cinny_container_image_self_build | bool"
   block:
-    - name: Ensure Linkwarden container image is pulled via community.docker.docker_image
+    - name: Ensure Cinny container image is pulled via community.docker.docker_image
       when: devture_systemd_docker_base_container_image_pull_method == 'ansible-module'
       community.docker.docker_image:
-        name: "{{ linkwarden_container_image }}"
+        name: "{{ cinny_container_image }}"
         source: "{{ 'pull' if ansible_version.major > 2 or ansible_version.minor > 7 else omit }}"
-        force_source: "{{ linkwarden_container_image_force_pull if ansible_version.major > 2 or ansible_version.minor >= 8 else omit }}"
-        force: "{{ omit if ansible_version.major > 2 or ansible_version.minor >= 8 else linkwarden_container_image_force_pull }}"
+        force_source: "{{ cinny_container_image_force_pull if ansible_version.major > 2 or ansible_version.minor >= 8 else omit }}"
+        force: "{{ omit if ansible_version.major > 2 or ansible_version.minor >= 8 else cinny_container_image_force_pull }}"
       register: result
       retries: "{{ devture_playbook_help_container_retries_count }}"
       delay: "{{ devture_playbook_help_container_retries_delay }}"
       until: result is not failed
 
-    - name: Ensure Linkwarden container image is pulled via ansible.builtin.command
+    - name: Ensure Cinny container image is pulled via ansible.builtin.command
       when: devture_systemd_docker_base_container_image_pull_method == 'command'
       ansible.builtin.command:
-        cmd: "{{ devture_systemd_docker_base_host_command_docker }} pull {{ linkwarden_container_image }}"
+        cmd: "{{ devture_systemd_docker_base_host_command_docker }} pull {{ cinny_container_image }}"
       register: result
       retries: "{{ devture_playbook_help_container_retries_count }}"
       delay: "{{ devture_playbook_help_container_retries_delay }}"
       until: result is not failed
       changed_when: "'Downloaded newer image' in result.stdout"
 
-- name: Run if self-building of Linkwarden container image is enabled
-  when: "linkwarden_container_image_self_build | bool"
+- name: Run if self-building of Cinny container image is enabled
+  when: "cinny_container_image_self_build | bool"
   block:
-    - name: Ensure Linkwarden repository is present on self-build
+    - name: Ensure Cinny repository is present on self-build
       ansible.builtin.git:
-        repo: "{{ linkwarden_container_image_self_build_repo }}"
-        version: "{{ linkwarden_container_image_self_build_repo_version }}"
-        dest: "{{ linkwarden_container_image_self_build_src_files_path }}"
+        repo: "{{ cinny_container_image_self_build_repo }}"
+        version: "{{ cinny_container_image_self_build_repo_version }}"
+        dest: "{{ cinny_container_image_self_build_src_files_path }}"
         force: "yes"
-      register: linkwarden_git_pull_results
+      register: cinny_git_pull_results
 
     # Invoking the `docker build` command here, instead of calling the `docker_image` Ansible module,
     # because the latter does not support BuildKit.
     # See: https://github.com/ansible-collections/community.general/issues/514
-    - name: Ensure Linkwarden container image is built
+    - name: Ensure Cinny container image is built
       ansible.builtin.shell:
-        chdir: "{{ linkwarden_container_image_self_build_src_files_path }}"
+        chdir: "{{ cinny_container_image_self_build_src_files_path }}"
         cmd: |
           {{ devture_systemd_docker_base_host_command_docker }} build \
-          -t "{{ linkwarden_container_image_self_build_name }}" \
+          -t "{{ cinny_container_image_self_build_name }}" \
           -f Dockerfile \
           .
       environment:
@@ -79,28 +79,28 @@
       register: result
       changed_when: "'Successfully built' in result.stdout or ('writing image' in result.stderr and 'CACHED' not in result.stderr)"
 
-- name: Ensure Linkwarden container network is created via community.docker.docker_network
+- name: Ensure Cinny container network is created via community.docker.docker_network
   when: devture_systemd_docker_base_container_network_creation_method == 'ansible-module'
   community.docker.docker_network:
     enable_ipv6: "{{ devture_systemd_docker_base_ipv6_enabled }}"
-    name: "{{ linkwarden_container_network }}"
+    name: "{{ cinny_container_network }}"
     driver: bridge
     driver_options: "{{ devture_systemd_docker_base_container_networks_driver_options }}"
 
-- name: Ensure Linkwarden container network is created via ansible.builtin.command
+- name: Ensure Cinny container network is created via ansible.builtin.command
   when: devture_systemd_docker_base_container_network_creation_method == 'command'
   ansible.builtin.command:
     cmd: >-
       {{ devture_systemd_docker_base_host_command_docker }} network create
       {% if devture_systemd_docker_base_ipv6_enabled %}--ipv6{% endif %}
       {{ devture_systemd_docker_base_container_networks_driver_options_string }}
-      {{ linkwarden_container_network }}
+      {{ cinny_container_network }}
   register: network_creation_result
   changed_when: network_creation_result.rc == 0
   failed_when: network_creation_result.rc != 0 and 'already exists' not in network_creation_result.stderr
 
-- name: Ensure Linkwarden systemd service is present
+- name: Ensure Cinny systemd service is present
   ansible.builtin.template:
-    src: "{{ role_path }}/templates/systemd/linkwarden.service.j2"
-    dest: "{{ devture_systemd_docker_base_systemd_path }}/{{ linkwarden_identifier }}.service"
+    src: "{{ role_path }}/templates/systemd/cinny.service.j2"
+    dest: "{{ devture_systemd_docker_base_systemd_path }}/{{ cinny_identifier }}.service"
     mode: "0644"

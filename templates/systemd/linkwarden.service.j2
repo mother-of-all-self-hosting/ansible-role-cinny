@@ -7,12 +7,12 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 #}
 
 [Unit]
-Description=Linkwarden ({{ linkwarden_identifier }})
-{% for service in linkwarden_systemd_required_services_list %}
+Description=Cinny ({{ cinny_identifier }})
+{% for service in cinny_systemd_required_services_list %}
 Requires={{ service }}
 After={{ service }}
 {% endfor %}
-{% for service in linkwarden_systemd_wanted_services_list %}
+{% for service in cinny_systemd_wanted_services_list %}
 Wants={{ service }}
 {% endfor %}
 DefaultDependencies=no
@@ -20,45 +20,45 @@ DefaultDependencies=no
 [Service]
 Type=simple
 Environment="HOME={{ devture_systemd_docker_base_systemd_unit_home_path }}"
-ExecStartPre=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_systemd_docker_base_host_command_docker }} stop -t {{ devture_systemd_docker_base_container_stop_grace_time_seconds }} {{ linkwarden_identifier }} 2>/dev/null || true'
-ExecStartPre=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_systemd_docker_base_host_command_docker }} rm {{ linkwarden_identifier }} 2>/dev/null || true'
+ExecStartPre=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_systemd_docker_base_host_command_docker }} stop -t {{ devture_systemd_docker_base_container_stop_grace_time_seconds }} {{ cinny_identifier }} 2>/dev/null || true'
+ExecStartPre=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_systemd_docker_base_host_command_docker }} rm {{ cinny_identifier }} 2>/dev/null || true'
 
 {#
-  Currently root access without read-only option is necessary for Linkwarden to work properly.
-  See: https://github.com/linkwarden/linkwarden/issues/799
+  Currently root access without read-only option is necessary for Cinny to work properly.
+  See: https://github.com/cinny/cinny/issues/799
 #}
 ExecStartPre={{ devture_systemd_docker_base_host_command_docker }} create \
       --rm \
-      --name={{ linkwarden_identifier }} \
+      --name={{ cinny_identifier }} \
       --log-driver=none \
       --cap-drop=ALL \
-      --network={{ linkwarden_container_network }} \
-      {% if linkwarden_container_http_host_bind_port %}
-      -p {{ linkwarden_container_http_host_bind_port }}:{{ linkwarden_container_http_port }} \
+      --network={{ cinny_container_network }} \
+      {% if cinny_container_http_host_bind_port %}
+      -p {{ cinny_container_http_host_bind_port }}:{{ cinny_container_http_port }} \
       {% endif %}
-      --env-file={{ linkwarden_base_path }}/env \
-      --label-file={{ linkwarden_base_path }}/labels \
-      --mount type=bind,src={{ linkwarden_data_path }},dst=/data/data \
-      {% for volume in linkwarden_container_additional_volumes %}
+      --env-file={{ cinny_base_path }}/env \
+      --label-file={{ cinny_base_path }}/labels \
+      --mount type=bind,src={{ cinny_data_path }},dst=/data/data \
+      {% for volume in cinny_container_additional_volumes %}
       --mount type={{ volume.type | default('bind' if '/' in volume.src else 'volume') }},src={{ volume.src }},dst={{ volume.dst }}{{ (',' + volume.options) if volume.options else '' }} \
       {% endfor %}
-      {% for arg in linkwarden_container_extra_arguments %}
+      {% for arg in cinny_container_extra_arguments %}
       {{ arg }} \
       {% endfor %}
-      {{ linkwarden_container_image_self_build_name if linkwarden_container_image_self_build else linkwarden_container_image }}
+      {{ cinny_container_image_self_build_name if cinny_container_image_self_build else cinny_container_image }}
 
-{% for network in linkwarden_container_additional_networks %}
-ExecStartPre={{ devture_systemd_docker_base_host_command_docker }} network connect {{ network }} {{ linkwarden_identifier }}
+{% for network in cinny_container_additional_networks %}
+ExecStartPre={{ devture_systemd_docker_base_host_command_docker }} network connect {{ network }} {{ cinny_identifier }}
 {% endfor %}
 
-ExecStart={{ devture_systemd_docker_base_host_command_docker }} start --attach {{ linkwarden_identifier }}
+ExecStart={{ devture_systemd_docker_base_host_command_docker }} start --attach {{ cinny_identifier }}
 
-ExecStop=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_systemd_docker_base_host_command_docker }} stop -t {{ devture_systemd_docker_base_container_stop_grace_time_seconds }} {{ linkwarden_identifier }} 2>/dev/null || true'
-ExecStop=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_systemd_docker_base_host_command_docker }} rm {{ linkwarden_identifier }} 2>/dev/null || true'
+ExecStop=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_systemd_docker_base_host_command_docker }} stop -t {{ devture_systemd_docker_base_container_stop_grace_time_seconds }} {{ cinny_identifier }} 2>/dev/null || true'
+ExecStop=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_systemd_docker_base_host_command_docker }} rm {{ cinny_identifier }} 2>/dev/null || true'
 
 Restart=always
 RestartSec=30
-SyslogIdentifier={{ linkwarden_identifier }}
+SyslogIdentifier={{ cinny_identifier }}
 
 [Install]
 WantedBy=multi-user.target

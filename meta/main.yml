@@ -2,9 +2,9 @@
 galaxy_info:
   author: Suguru Hirahara
   company: progressiv
-  role_name: linkwarden
+  role_name: cinny
   namespace: progressiv
-  description: Linkwarden
+  description: Cinny
   platforms:
     - name: Debian
       versions:

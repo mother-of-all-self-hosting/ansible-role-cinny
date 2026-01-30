@@ -5,57 +5,57 @@ SPDX-FileCopyrightText: 2025 Suguru Hirahara
 SPDX-License-Identifier: AGPL-3.0-or-later
 #}
 
-{% if linkwarden_container_labels_traefik_enabled %}
+{% if cinny_container_labels_traefik_enabled %}
 traefik.enable=true
 
-{% if linkwarden_container_labels_traefik_docker_network %}
-traefik.docker.network={{ linkwarden_container_labels_traefik_docker_network }}
+{% if cinny_container_labels_traefik_docker_network %}
+traefik.docker.network={{ cinny_container_labels_traefik_docker_network }}
 {% endif %}
 
 {% set middlewares = [] %}
 
-{% if linkwarden_container_labels_traefik_path_prefix != '/' %}
-traefik.http.middlewares.{{ linkwarden_identifier }}-slashless-redirect.redirectregex.regex=^({{ linkwarden_container_labels_traefik_path_prefix | quote }})$
-traefik.http.middlewares.{{ linkwarden_identifier }}-slashless-redirect.redirectregex.replacement=${1}/
-{% set middlewares = middlewares + [linkwarden_identifier + '-slashless-redirect'] %}
+{% if cinny_container_labels_traefik_path_prefix != '/' %}
+traefik.http.middlewares.{{ cinny_identifier }}-slashless-redirect.redirectregex.regex=^({{ cinny_container_labels_traefik_path_prefix | quote }})$
+traefik.http.middlewares.{{ cinny_identifier }}-slashless-redirect.redirectregex.replacement=${1}/
+{% set middlewares = middlewares + [cinny_identifier + '-slashless-redirect'] %}
 {% endif %}
 
-{% if linkwarden_container_labels_traefik_path_prefix != '/' %}
-traefik.http.middlewares.{{ linkwarden_identifier }}-strip-prefix.stripprefix.prefixes={{ linkwarden_container_labels_traefik_path_prefix }}
-{% set middlewares = middlewares + [linkwarden_identifier + '-strip-prefix'] %}
+{% if cinny_container_labels_traefik_path_prefix != '/' %}
+traefik.http.middlewares.{{ cinny_identifier }}-strip-prefix.stripprefix.prefixes={{ cinny_container_labels_traefik_path_prefix }}
+{% set middlewares = middlewares + [cinny_identifier + '-strip-prefix'] %}
 {% endif %}
 
-{% if linkwarden_container_labels_traefik_additional_request_headers.keys() | length > 0 %}
-{% for name, value in linkwarden_container_labels_traefik_additional_request_headers.items() %}
-traefik.http.middlewares.{{ linkwarden_identifier }}-add-request-headers.headers.customrequestheaders.{{ name }}={{ value }}
+{% if cinny_container_labels_traefik_additional_request_headers.keys() | length > 0 %}
+{% for name, value in cinny_container_labels_traefik_additional_request_headers.items() %}
+traefik.http.middlewares.{{ cinny_identifier }}-add-request-headers.headers.customrequestheaders.{{ name }}={{ value }}
 {% endfor %}
-{% set middlewares = middlewares + [linkwarden_identifier + '-add-request-headers'] %}
+{% set middlewares = middlewares + [cinny_identifier + '-add-request-headers'] %}
 {% endif %}
 
-{% if linkwarden_container_labels_traefik_additional_response_headers.keys() | length > 0 %}
-{% for name, value in linkwarden_container_labels_traefik_additional_response_headers.items() %}
-traefik.http.middlewares.{{ linkwarden_identifier }}-add-response-headers.headers.customresponseheaders.{{ name }}={{ value }}
+{% if cinny_container_labels_traefik_additional_response_headers.keys() | length > 0 %}
+{% for name, value in cinny_container_labels_traefik_additional_response_headers.items() %}
+traefik.http.middlewares.{{ cinny_identifier }}-add-response-headers.headers.customresponseheaders.{{ name }}={{ value }}
 {% endfor %}
-{% set middlewares = middlewares + [linkwarden_identifier + '-add-response-headers'] %}
+{% set middlewares = middlewares + [cinny_identifier + '-add-response-headers'] %}
 {% endif %}
 
-traefik.http.routers.{{ linkwarden_identifier }}.rule={{ linkwarden_container_labels_traefik_rule }}
-{% if linkwarden_container_labels_traefik_priority | int > 0 %}
-traefik.http.routers.{{ linkwarden_identifier }}.priority={{ linkwarden_container_labels_traefik_priority }}
+traefik.http.routers.{{ cinny_identifier }}.rule={{ cinny_container_labels_traefik_rule }}
+{% if cinny_container_labels_traefik_priority | int > 0 %}
+traefik.http.routers.{{ cinny_identifier }}.priority={{ cinny_container_labels_traefik_priority }}
 {% endif %}
-traefik.http.routers.{{ linkwarden_identifier }}.service={{ linkwarden_identifier }}
+traefik.http.routers.{{ cinny_identifier }}.service={{ cinny_identifier }}
 {% if middlewares | length > 0 %}
-traefik.http.routers.{{ linkwarden_identifier }}.middlewares={{ middlewares | join(',') }}
+traefik.http.routers.{{ cinny_identifier }}.middlewares={{ middlewares | join(',') }}
 {% endif %}
-traefik.http.routers.{{ linkwarden_identifier }}.entrypoints={{ linkwarden_container_labels_traefik_entrypoints }}
-traefik.http.routers.{{ linkwarden_identifier }}.tls={{ linkwarden_container_labels_traefik_tls | to_json }}
-{% if linkwarden_container_labels_traefik_tls %}
-traefik.http.routers.{{ linkwarden_identifier }}.tls.certResolver={{ linkwarden_container_labels_traefik_tls_certResolver }}
-{% endif %}
-
-traefik.http.services.{{ linkwarden_identifier }}.loadbalancer.server.port={{ linkwarden_container_http_port }}
+traefik.http.routers.{{ cinny_identifier }}.entrypoints={{ cinny_container_labels_traefik_entrypoints }}
+traefik.http.routers.{{ cinny_identifier }}.tls={{ cinny_container_labels_traefik_tls | to_json }}
+{% if cinny_container_labels_traefik_tls %}
+traefik.http.routers.{{ cinny_identifier }}.tls.certResolver={{ cinny_container_labels_traefik_tls_certResolver }}
 {% endif %}
 
-{% for arg in linkwarden_container_labels_additional_labels %}
+traefik.http.services.{{ cinny_identifier }}.loadbalancer.server.port={{ cinny_container_http_port }}
+{% endif %}
+
+{% for arg in cinny_container_labels_additional_labels %}
 {{ arg }}
 {% endfor %}
