@@ -13,18 +13,21 @@ SPDX-FileCopyrightText: 2023 Felix Stupp
 SPDX-FileCopyrightText: 2023 Julian-Samuel Gebühr
 SPDX-FileCopyrightText: 2023 Pierre 'McFly' Marty
 SPDX-FileCopyrightText: 2024 Thomas Miceli
-SPDX-FileCopyrightText: 2024, 2025 Suguru Hirahara
+SPDX-FileCopyrightText: 2024-2026 Suguru Hirahara
 
 SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 
 # Setting up Cinny
 
-This is an [Ansible](https://www.ansible.com/) role which installs [Cinny](https://cinny.app/) to run as a [Docker](https://www.docker.com/) container wrapped in a systemd service.
+This is an [Ansible](https://www.ansible.com/) role which installs [Cinny](https://github.com/ajbura/cinny) to run as a [Docker](https://www.docker.com/) container wrapped in a systemd service.
 
-Cinny is a self-hosted, open-source collaborative bookmark manager to collect, organize and archive webpages.
+Cinny is a web client for [Matrix](https://matrix.org/), realtime communication (chat) network. It focuses primarily on simple, elegant and secure interface.
 
-See the project's [documentation](https://docs.cinny.app) to learn what Cinny does and why it might be useful to you.
+See the project's [documentation](https://github.com/cinnyapp/cinny/blob/dev/README.md) to learn what Cinny does and why it might be useful to you.
+
+>[!NOTE]
+> This role merely enables you to set up the client; To communicate with other people on the Matrix network you need to prepare a Matrix homeserver which this client can connect to. While it is still possible to use a public homeserver with the Cinny instance, [this "matrix-docker-ansible-deploy" Ansible playbook](https://github.com/spantaleev/matrix-docker-ansible-deploy/) lets you set up Matrix services from the core ones such as a homeserver to other goodies like "bridges" on your server — it is pretty complete and well maintained.
 
 ## Adjusting the playbook configuration
 
@@ -60,18 +63,22 @@ After adjusting the hostname, make sure to adjust your DNS records to point the 
 
 **Note**: hosting Cinny under a subpath (by configuring the `cinny_path_prefix` variable) does not seem to be possible due to Cinny's technical limitations.
 
+### Set the default homeserver URL
+
+It is also necessary to specify the default homeserver's URL by adding the following configuration to your `vars.yml` file:
+
+```yaml
+cinny_default_hs_url: YOUR_HOMESERVER_URL_HERE
+```
+
 ### Extending the configuration
 
-There are some additional things you may wish to configure about the component.
+There are some additional things you may wish to configure about the service.
 
 Take a look at:
 
-- [`defaults/main.yml`](../defaults/main.yml) for some variables that you can customize via your `vars.yml` file. You can override settings (even those that don't have dedicated playbook variables) using the `cinny_environment_variables_additional_variables` variable
-
-See its [environment variables](https://raw.githubusercontent.com/cinny/cinny/refs/heads/main/.env.sample) for a complete list of Cinny's config options that you could put in `cinny_environment_variables_additional_variables`.
-
->[!NOTE]
-> Not all environment variables are documented on [this page](https://docs.cinny.app/self-hosting/environment-variables).
+- [`defaults/main.yml`](../defaults/main.yml)` for some variables that you can customize via your `vars.yml` file
+- [`templates/config.json.j2`](../templates/config.json.j2) for the component's default configuration. You can override settings (even those that don't have dedicated playbook variables) using the `cinny_configuration_extension_json` variable
 
 ## Installing
 
@@ -87,7 +94,7 @@ If you use the MASH playbook, the shortcut commands with the [`just` program](ht
 
 After running the command for installation, Cinny becomes available at the specified hostname like `https://example.com`.
 
-To get started, open the URL with a web browser, and register the account. **Note that the first registered user becomes an administrator automatically.**
+To get started, open the URL with a web browser, and log in to your homeserver with the Matrix account.
 
 ## Troubleshooting
 
