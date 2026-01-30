@@ -24,15 +24,13 @@ Environment="HOME={{ devture_systemd_docker_base_systemd_unit_home_path }}"
 ExecStartPre=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_systemd_docker_base_host_command_docker }} stop -t {{ devture_systemd_docker_base_container_stop_grace_time_seconds }} {{ cinny_identifier }} 2>/dev/null || true'
 ExecStartPre=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_systemd_docker_base_host_command_docker }} rm {{ cinny_identifier }} 2>/dev/null || true'
 
-{#
-  Currently root access without read-only option is necessary for Cinny to work properly.
-  See: https://github.com/cinny/cinny/issues/799
-#}
 ExecStartPre={{ devture_systemd_docker_base_host_command_docker }} create \
       --rm \
       --name={{ cinny_identifier }} \
       --log-driver=none \
+      --user={{ cinny_uid }}:{{ cinny_gid }} \
       --cap-drop=ALL \
+      --read-only \
       --network={{ cinny_container_network }} \
       {% if cinny_container_http_host_bind_port %}
       -p {{ cinny_container_http_host_bind_port }}:{{ cinny_container_http_port }} \
