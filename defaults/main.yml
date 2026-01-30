@@ -100,6 +100,9 @@ cinny_container_labels_traefik_additional_request_headers: "{{ cinny_container_l
 cinny_container_labels_traefik_additional_request_headers_auto: {}
 cinny_container_labels_traefik_additional_request_headers_custom: {}
 
+# Specify the size of the container's tmpfs volume
+cinny_container_tmpfs_tmp_size: 10m
+
 # Controls which additional headers to attach to all HTTP responses.
 # To add your own custom response headers, use `cinny_container_labels_traefik_additional_response_headers_custom`
 cinny_container_labels_traefik_additional_response_headers: "{{ cinny_container_labels_traefik_additional_response_headers_auto | combine(cinny_container_labels_traefik_additional_response_headers_custom) }}"
