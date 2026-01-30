@@ -1,0 +1,27 @@
+# SPDX-FileCopyrightText: 2023 Slavi Pantaleev
+# SPDX-FileCopyrightText: 2025 Suguru Hirahara
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+---
+- name: Perform Linkwarden installation tasks
+  when: linkwarden_enabled | bool
+  tags:
+    - setup-all
+    - setup-linkwarden
+    - install-all
+    - install-linkwarden
+  block:
+    - name: Validate Linkwarden configuration
+      ansible.builtin.include_tasks: "{{ role_path }}/tasks/validate_config.yml"
+    - name: Install Linkwarden
+      ansible.builtin.include_tasks: "{{ role_path }}/tasks/install.yml"
+
+- name: Perform Linkwarden uninstallation tasks
+  when: not linkwarden_enabled | bool
+  tags:
+    - setup-all
+    - setup-linkwarden
+  block:
+    - name: Uninstall Linkwarden
+      ansible.builtin.include_tasks: "{{ role_path }}/tasks/uninstall.yml"
