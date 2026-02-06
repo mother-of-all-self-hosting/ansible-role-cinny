@@ -256,3 +256,6 @@ cinny_environment_variables_tz: UTC
 
 # Additional environment variables.
 cinny_environment_variables_additional_variables: ""
+
+# Control if the self-check feature should validate SSL certificates.
+cinny_self_check_validate_certificates: true

@@ -17,6 +17,14 @@
     - name: Install Cinny
       ansible.builtin.include_tasks: "{{ role_path }}/tasks/install.yml"
 
+- name: Perform Cinny self-check tasks
+  when: cinny_enabled | bool
+  tags:
+    - self-check-cinny
+  block:
+    - name: Run self-check for Cinny
+      ansible.builtin.include_tasks: "{{ role_path }}/tasks/self_check.yml"
+
 - name: Perform Cinny uninstallation tasks
   when: not cinny_enabled | bool
   tags:
