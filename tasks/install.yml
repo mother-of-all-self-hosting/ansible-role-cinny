@@ -99,6 +99,7 @@
           path: "{{ cinny_container_image_self_build_src_files_path }}"
           pull: true
           args:
+      register: cinny_container_image_build_result
 
 - name: Ensure Cinny container network is created via community.docker.docker_network
   when: devture_systemd_docker_base_container_network_creation_method == 'ansible-module'
@@ -136,4 +137,5 @@
         or cinny_config_result.changed | default(false)
         or cinny_systemd_service_result.changed | default(false)
         or cinny_container_image_pull_result.changed | default(false)
+        or cinny_container_image_build_result.changed | default(false)
       }}
