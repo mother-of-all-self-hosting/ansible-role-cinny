@@ -47,7 +47,7 @@ Currently there is one testing scenario available.
 
 ### `default`
 
-Tests a standard AnonymousOverflow installation.
+Tests a standard Cinny installation.
 
 ## Running
 
