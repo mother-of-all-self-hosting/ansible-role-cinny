@@ -34,8 +34,7 @@ provisioner:
         cinny_hostname: cinny
         cinny_container_labels_traefik_enabled: false
         cinny_container_http_host_bind_port: 8080
-        cinny_base_url: http://localhost:8080/
-        cinny_environment_variable_jwt_signing_secret: secret
+        cinny_default_hs_url: https://matrix.org
   env:
     # Workaround for https://github.com/ansible/molecule/issues/4391
     ANSIBLE_ROLES_PATH: ${MOLECULE_PROJECT_DIRECTORY}/..:/.ansible/roles:/usr/share/ansible/roles:/etc/ansible/roles:~/.ansible/roles
