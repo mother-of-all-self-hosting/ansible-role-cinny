@@ -33,7 +33,8 @@ provisioner:
         # Variables for Cinny
         cinny_uid: 1000
         cinny_gid: 1000
-        cinny_hostname: cinny
+        cinny_scheme: http
+        cinny_hostname: localhost
         cinny_container_labels_traefik_enabled: false
         cinny_container_http_host_bind_port: 8080
         cinny_default_hs_url: https://matrix.org
