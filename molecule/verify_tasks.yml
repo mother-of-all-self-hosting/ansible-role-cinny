@@ -261,15 +261,13 @@
   register: cinny_bundle_version
   changed_when: false
 
-- name: Assert the running Cinny is the version the role pins
+- name: Assert the running Cinny is the version this role installs
   ansible.builtin.assert:
     that:
       - cinny_bundle_version.stdout_lines | length > 0
       - cinny_defaults.cinny_version in cinny_bundle_version.stdout.split()
-    fail_msg: >-
-      The running Cinny reports version(s) {{ cinny_bundle_version.stdout | default('(none found)') }},
-      expected {{ cinny_defaults.cinny_version }} from defaults/main.yml
-    success_msg: "The running Cinny reports {{ cinny_defaults.cinny_version }}, the version defaults/main.yml pins"
+    fail_msg: "Cinny reports {{ cinny_bundle_version.stdout | default('none') }}, expected {{ cinny_defaults.cinny_version }}"
+    success_msg: "Cinny reports {{ cinny_bundle_version.stdout }}"
 
 - name: Remove the downloaded Cinny application bundle
   ansible.builtin.file:
