@@ -274,7 +274,7 @@
     path: "{{ cinny_molecule_bundle_path }}"
     state: absent
 
-- name: Show Cinny verification summary
+- name: Show the Cinny verification summary
   ansible.builtin.debug:
     msg:
       - "Cinny systemd: {{ cinny_service.status.ActiveState }}"
