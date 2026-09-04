@@ -7,13 +7,10 @@
 ---
 # Tasks shared by every scenario.
 
-# Role defaults are not in scope in a verification playbook, but the Cinny
-# version that Renovate bumps lives in them and is what the running
-# application is checked against below. `include_vars` does not template,
-# so only values that are literals in the file can be read this way -
-# `cinny_version` is one, `cinny_container_image` (which is built out of
-# it with Jinja) is not.
-- name: Load the Cinny role defaults
+# The role is not included in this playbook, so its defaults are not in
+# scope. Reading defaults/main.yml directly ties the version assertion
+# below.
+- name: Load the role defaults
   ansible.builtin.include_vars:
     file: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') }}/defaults/main.yml"
     name: cinny_defaults
