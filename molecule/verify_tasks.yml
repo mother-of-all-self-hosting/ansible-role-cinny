@@ -45,12 +45,12 @@
       - docker
       - inspect
       - cinny
-  register: cinny_container_inspect
+  register: cinny_container_raw
   changed_when: false
 
 - name: Parse the Cinny container inspection
   ansible.builtin.set_fact:
-    cinny_container: "{{ (cinny_container_inspect.stdout | from_json)[0] }}"
+    cinny_container: "{{ (cinny_container_raw.stdout | from_json)[0] }}"
 
 # The systemd unit is what turns the role's variables into `docker create`
 # arguments. Reading them back off the running container is what proves
