@@ -47,10 +47,7 @@
 
 - name: Inspect the running Cinny container
   ansible.builtin.command:
-    argv:
-      - docker
-      - inspect
-      - cinny
+    cmd: docker container inspect cinny
   register: cinny_container_raw
   changed_when: false
 
