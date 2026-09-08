@@ -38,7 +38,7 @@
 - name: Retrieve the Cinny systemd service log for debugging
   when: cinny_debug_service_enabled | bool
   ansible.builtin.command:
-    cmd: journalctl -xeu cinny.service
+    cmd: journalctl --no-pager --output=cat --unit=cinny.service
   changed_when: false
 
 # ------------------------------------------------------------------
