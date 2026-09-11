@@ -15,13 +15,14 @@
     file: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') }}/defaults/main.yml"
     name: cinny_defaults
 
-- name: Wait for the Cinny systemd service to become active (up to 180s)
+- name: Wait for the Cinny systemd services to become active (up to 180s each)
   ansible.builtin.systemd_service:
-    name: cinny.service
-  register: cinny_service
-  until: cinny_service.status.ActiveState == 'active'
+    name: "{{ item }}"
+  register: cinny_services
+  until: cinny_services.status.ActiveState == 'active'
   retries: 36
   delay: 5
+  loop: "{{ cinny_verify_units }}"
   # So that giving up is reported by the assertion below rather than as a
   # wall of systemd unit properties.
   failed_when: false
@@ -29,17 +30,20 @@
 # `Restart=always` in the systemd unit means that even a container which crashes
 # and gets restarted reads as active here, so this is a precondition rather than
 # a result.
-- name: Assert the Cinny systemd service is active
+- name: Assert the Cinny systemd services are active
   ansible.builtin.assert:
-    that: cinny_service.status.ActiveState == 'active'
-    fail_msg: "cinny.service is not active ({{ cinny_service.status.ActiveState }})"
-    success_msg: "cinny.service is active"
+    that: cinny_services.results | map(attribute='status.ActiveState') | unique | list == ['active']
+    fail_msg: >-
+      Not every service is active:
+      {{ dict(cinny_verify_units | zip(cinny_services.results | map(attribute='status.ActiveState'))) }}
+    success_msg: "Every systemd service is active"
 
-- name: Retrieve the Cinny systemd service log for debugging
+- name: Retrieve the Cinny systemd services log for debugging
   when: cinny_debug_service_enabled | bool
   ansible.builtin.command:
-    cmd: journalctl --no-pager --output=cat --unit=cinny.service
+    cmd: "journalctl --no-pager --output=cat --unit={{ item }}"
   changed_when: false
+  loop: "{{ cinny_verify_units }}"
 
 # ------------------------------------------------------------------
 # The container the role actually started
@@ -269,7 +273,7 @@
 - name: Show the Cinny verification summary
   ansible.builtin.debug:
     msg:
-      - "Cinny systemd: {{ cinny_service.status.ActiveState }}"
+      - "Cinny systemd: {% for unit, state in cinny_verify_units | zip(cinny_services.results | map(attribute='status.ActiveState')) %}{{ unit }} ({{ state }}){% if not loop.last %}, {% endif %}{% endfor %}"
       - "Cinny container user: {{ cinny_container.Config.User }}"
       - "Cinny running version: {{ cinny_bundle_version.stdout }}"
       - "Cinny page size: {{ cinny_index.content | length }} bytes"
