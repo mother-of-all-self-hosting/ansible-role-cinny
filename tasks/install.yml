@@ -86,6 +86,7 @@
         owner: "{{ cinny_uid }}"
         group: "{{ cinny_gid }}"
         recurse: true
+      tags: molecule-idempotence-notest
 
     - name: Ensure Cinny repository is present on self-build
       ansible.builtin.git:
